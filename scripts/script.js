@@ -17,3 +17,9 @@ modalAdd.addEventListener('click', (event) => {
     modalSubmit.reset();
   }
 });
+
+document.addEventListener('keydown', (event) => {
+  if(event.key === 'Escape') {
+    modalAdd.classList.add('hide');
+  }
+});
