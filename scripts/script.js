@@ -17,9 +17,18 @@ const closeModal = function(event) {
   }
 }
 
+const closeModalEscape = function(event) {
+  if(event.key === 'Escape') {
+    modalAdd.classList.add('hide');
+    modalItem.classList.add('hide');
+    document.removeEventListener('keydown', closeModalEscape);
+  }
+}
+
 addAd.addEventListener('click', () => {
   modalAdd.classList.remove('hide');
   modalBtnSubmit.disabled = true;
+  document.addEventListener('keydown', closeModalEscape);
 });
 
 modalAdd.addEventListener('click', closeModal);
@@ -29,12 +38,6 @@ catalog.addEventListener('click', (event) => {
   const target = event.target;
   if(target.closest('.card')) {
     modalItem.classList.remove('hide');
-  }
-});
-
-document.addEventListener('keydown', (event) => {
-  if(event.key === 'Escape') {
-    modalAdd.classList.add('hide');
-    modalItem.classList.add('hide');
+    document.addEventListener('keydown', closeModalEscape);
   }
 });
