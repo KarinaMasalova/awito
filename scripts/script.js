@@ -6,6 +6,10 @@ const modalBtnSubmit = document.querySelector('.modal__btn-submit');
 const modalSubmit = document.querySelector('.modal__submit');
 const catalog = document.querySelector('.catalog');
 const modalItem = document.querySelector('.modal__item');
+const modalBtnWarning = document.querySelector('.modal__btn-warning');
+
+const elementsModalSubmit = [...modalSubmit.elements]
+  .filter(el => el.tagName !== 'BUTTON' &&  el.type !== 'submit');
 
 const closeModal = function(event) {
   const target = event.target;
@@ -24,6 +28,12 @@ const closeModalEscape = function(event) {
     document.removeEventListener('keydown', closeModalEscape);
   }
 }
+
+modalSubmit.addEventListener('input', () => {
+  const validForm = elementsModalSubmit.every(el => el.value);
+  modalBtnSubmit.disabled = !validForm;
+  modalBtnWarning.style.display = validForm ? 'none' : '';
+});
 
 addAd.addEventListener('click', () => {
   modalAdd.classList.remove('hide');
