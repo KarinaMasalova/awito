@@ -18,6 +18,7 @@ const modalStatusItem = document.querySelector('.modal__status-item');
 const modalDescriptionItem = document.querySelector('.modal__description-item');
 const modalCostItem = document.querySelector('.modal__cost-item');
 const searchInput = document.querySelector('.search__input');
+const menuContainer = document.querySelector('.menu__container');
 
 const textFileBtn = modalFileBtn.textContent;
 const srcModalImage = modalImgAdd.src;
@@ -29,6 +30,8 @@ const infoPhoto = {};
 
 /* send data to localStorage */
 const saveDB = () =>  localStorage.setItem('awito', JSON.stringify(dataBase));
+
+let counter = dataBase.length;
 
 /*handler inside the ad submission form */
 const checkForm = () => {
@@ -52,9 +55,9 @@ const closeModal = event => {
   }
 };
 
-const renderCard = () => {
+const renderCard = (db = dataBase) => {
   catalog.textContent = '';
-  dataBase.forEach((item, i) => {
+  db.forEach((item, i) => {
     catalog.insertAdjacentHTML('beforeend', `
       <li class="card" data-id-item="${i}">
         <img class="card__image" src="data:image/jpeg;base64,${item.image}" alt="test">
@@ -67,12 +70,23 @@ const renderCard = () => {
   });
 };
 
+searchInput.addEventListener('input', event => {
+  const valueSearch = searchInput.value.trim().toLowerCase();
+  if(valueSearch.length > 2) {
+    const result = dataBase.filter(item => item.nameItem.toLowerCase().includes(valueSearch) ||
+                                  item.descriptionItem.toLowerCase().includes(valueSearch));
+    renderCard(result);
+  }
+});
+
 modalFileInput.addEventListener('change', event => {
   const target = event.target;
   const reader = new FileReader();
   const file = target.files[0];
+
   infoPhoto.fileName = file.name;
   infoPhoto.size = file.size;
+
   reader.readAsBinaryString(file);
 
   reader.addEventListener('load', event => {
@@ -96,6 +110,7 @@ modalSubmit.addEventListener('submit', event => {
   for (const el of elementsModalSubmit) {
     itemObj[el.name] = el.value;
   }
+  itemObj.id = counter++;
   itemObj.image = infoPhoto.base64;
   dataBase.push(itemObj);
   closeModal({ target: modalAdd });
@@ -109,6 +124,14 @@ addAd.addEventListener('click', () => {
   document.addEventListener('keydown', closeModal);
 });
 
+menuContainer.addEventListener('click', event => {
+  const target = event.target;
+  if(target.tagName === 'A') {
+    const result = dataBase.filter(item => item.category === target.dataset.category);
+    renderCard();
+  }
+});
+
 modalAdd.addEventListener('click', closeModal);
 modalItem.addEventListener('click', closeModal);
 
@@ -116,7 +139,8 @@ catalog.addEventListener('click', (event) => {
   const target = event.target;
   const card = target.closest('.card');
   if(card) {
-    const item = dataBase[target.dataset.idItem];
+    const item = dataBase.find(obj => obj.id === +card.dataset.id);
+
     modalImgItem.src = `data:image/jpeg;base64,${item.image}`;
     modalHeaderItem.textContent = item.nameItem;
     modalStatusItem.textContent = item.status === 'new' ? 'Новый' : 'Б/У';
