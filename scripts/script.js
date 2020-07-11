@@ -1,5 +1,7 @@
 'use strict';
 
+const dataBase = [];
+
 const modalAdd = document.querySelector('.modal__add');
 const addAd = document.querySelector('.add__ad');
 const modalBtnSubmit = document.querySelector('.modal__btn-submit');
@@ -33,6 +35,16 @@ modalSubmit.addEventListener('input', () => {
   const validForm = elementsModalSubmit.every(el => el.value);
   modalBtnSubmit.disabled = !validForm;
   modalBtnWarning.style.display = validForm ? 'none' : '';
+});
+
+modalSubmit.addEventListener('submit', event => {
+  event.preventDefault();
+  const itemObj = {};
+  for (const el of elementsModalSubmit) {
+    itemObj[el.name] = el.value;
+  }
+  dataBase.push(itemObj);
+  modalSubmit.reset();
 });
 
 addAd.addEventListener('click', () => {
