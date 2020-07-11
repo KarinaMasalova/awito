@@ -104,12 +104,14 @@ modalFileInput.addEventListener('change', event => {
   reader.readAsBinaryString(file);
 
   reader.addEventListener('load', event => {
-    if(infoPhoto.size < 30000000) {
+    console.log(infoPhoto.size);
+    console.log(infoPhoto);
+    if(infoPhoto.size < 5500000) {
       modalFileBtn.textContent = infoPhoto.fileName;
       infoPhoto.base64 = btoa(event.target.result); /* convert img */
       modalImgAdd.src = `data:image/jpeg;base64,${infoPhoto.base64}`; /* adding picture */
     } else {
-      modalFileBtn.textContent = 'Файл не должен превышать 200 Кб';
+      modalFileBtn.textContent = 'Файл не должен превышать 5 Mб';
       modalFileInput.value = '';
       checkForm();
     }
