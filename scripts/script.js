@@ -1,6 +1,8 @@
 'use strict';
 
-const dataBase = /*JSON.parse(localStorage.getItem('awito') ||*/ [];
+const dataBase = JSON.parse(localStorage.getItem('awito') || []);
+let counter = dataBase.length;
+const infoPhoto = {};
 
 const modalAdd = document.querySelector('.modal__add');
 const addAd = document.querySelector('.add__ad');
@@ -26,12 +28,8 @@ const srcModalImage = modalImgAdd.src;
 const elementsModalSubmit = [...modalSubmit.elements]
   .filter(el => el.tagName !== 'BUTTON' &&  el.type !== 'submit');
 
-const infoPhoto = {};
-
 /* send data to localStorage */
 const saveDB = () =>  localStorage.setItem('awito', JSON.stringify(dataBase));
-
-let counter = dataBase.length;
 
 /*handler inside the ad submission form */
 const checkForm = () => {
@@ -59,8 +57,8 @@ const renderCard = (db = dataBase) => {
   catalog.textContent = '';
   db.forEach((item, i) => {
     catalog.insertAdjacentHTML('beforeend', `
-      <li class="card" data-id-item="${i}">
-        <img class="card__image" src="data:image/jpeg;base64,${item.image}" alt="test">
+      <li class="card" data-id-item="${item.id}">
+        <img class="card__image" src="data:image/jpeg;base64,${item.image}" alt="${item.nameItem}">
         <div class="card__description">
           <h3 class="card__header">${item.nameItem}</h3>
           <div class="card__price">${item.costItem}</div>
@@ -69,6 +67,22 @@ const renderCard = (db = dataBase) => {
     `); /* don't change but add */
   });
 };
+
+
+/* add ad to database */
+modalSubmit.addEventListener('submit', event => {
+  event.preventDefault();
+  const itemObj = {};
+  for (const el of elementsModalSubmit) {
+    itemObj[el.name] = el.value;
+  }
+  itemObj.id = counter++;
+  itemObj.image = infoPhoto.base64;
+  dataBase.push(itemObj);
+  closeModal({ target: modalAdd });
+  saveDB();
+  renderCard();
+});
 
 searchInput.addEventListener('input', event => {
   const valueSearch = searchInput.value.trim().toLowerCase();
@@ -104,24 +118,26 @@ modalFileInput.addEventListener('change', event => {
 
 modalSubmit.addEventListener('input', checkForm);
 
-modalSubmit.addEventListener('submit', event => {
-  event.preventDefault();
-  const itemObj = {};
-  for (const el of elementsModalSubmit) {
-    itemObj[el.name] = el.value;
-  }
-  itemObj.id = counter++;
-  itemObj.image = infoPhoto.base64;
-  dataBase.push(itemObj);
-  closeModal({ target: modalAdd });
-  saveDB();
-  renderCard();
-});
-
 addAd.addEventListener('click', () => {
   modalAdd.classList.remove('hide');
   modalBtnSubmit.disabled = true;
   document.addEventListener('keydown', closeModal);
+});
+
+catalog.addEventListener('click', (event) => {
+  const target = event.target;
+  const card = target.closest('.card');
+  if(card) {
+    const item = dataBase.find(obj => obj.id === +card.dataset.idItem);
+
+    modalImgItem.src = `data:image/jpeg;base64,${item.image}`;
+    modalHeaderItem.textContent = item.nameItem;
+    modalStatusItem.textContent = item.status === 'new' ? 'Новый' : 'Б/У';
+    modalDescriptionItem.textContent = item.descriptionItem;
+    modalCostItem.textContent = item.costItem;
+    modalItem.classList.remove('hide');
+    document.addEventListener('keydown', closeModal);
+  }
 });
 
 menuContainer.addEventListener('click', event => {
@@ -134,21 +150,5 @@ menuContainer.addEventListener('click', event => {
 
 modalAdd.addEventListener('click', closeModal);
 modalItem.addEventListener('click', closeModal);
-
-catalog.addEventListener('click', (event) => {
-  const target = event.target;
-  const card = target.closest('.card');
-  if(card) {
-    const item = dataBase.find(obj => obj.id === +card.dataset.id);
-
-    modalImgItem.src = `data:image/jpeg;base64,${item.image}`;
-    modalHeaderItem.textContent = item.nameItem;
-    modalStatusItem.textContent = item.status === 'new' ? 'Новый' : 'Б/У';
-    modalDescriptionItem.textContent = item.descriptionItem;
-    modalCostItem.textContent = item.costItem;
-    modalItem.classList.remove('hide');
-    document.addEventListener('keydown', closeModal);
-  }
-});
 
 renderCard();
