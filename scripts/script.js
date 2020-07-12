@@ -1,6 +1,6 @@
 'use strict';
 
-const dataBase = JSON.parse(localStorage.getItem('awito') || []);
+const dataBase = JSON.parse(localStorage.getItem('awito') || '[]');
 let counter = dataBase.length;
 const infoPhoto = {};
 
